@@ -225,6 +225,14 @@ const cache = {
   sortKey: null as string | null,
 };
 
+const updateView = (scrollPosition: number) => {
+  // Logic to update view
+};
+
+const renderCells = (scrollPosition: number) => {
+  // Logic to render cells
+};
+
 const handleEvent = async (event: Message) => {
   const message = event.data;
   switch (message.type) {
@@ -263,6 +271,16 @@ const handleEvent = async (event: Message) => {
       cache.sort = null;
       return;
     }
+    case "scroll": {
+      // Handle scrolling event
+      const scrollPosition = message.scrollPosition;
+      // Update view based on scroll position
+      updateView(scrollPosition);
+      // Render cell contents
+      renderCells(scrollPosition);
+      self.postMessage({ type: "scroll-done" });
+      return;
+    }
   }
 };
 
@@ -277,7 +295,14 @@ export type SetRowsEvent = {
   rows: Rows;
 };
 
-export type Message = MessageEvent<ComputeViewEvent | SetRowsEvent>;
+export type ScrollEvent = {
+  type: "scroll";
+  scrollPosition: number;
+};
+
+export type Message = MessageEvent<
+  ComputeViewEvent | SetRowsEvent | ScrollEvent
+>;
 
 self.addEventListener("message", (event: Message) => {
   handleEvent(event);
