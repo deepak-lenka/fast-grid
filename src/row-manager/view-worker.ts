@@ -1,4 +1,4 @@
-import { ComputeViewDoneEvent, Rows, View } from "./row-manager";
+import { ComputeViewDoneEvent, Rows, View as ViewConfig } from "./row-manager";
 import { Row } from "../row";
 import { sort as timSort } from "./timsort";
 import { Result } from "../utils/result";
@@ -15,7 +15,7 @@ const filterRows = async ({
   shouldCancel,
   onEarlyResults,
 }: {
-  filter: View["filter"];
+  filter: ViewConfig["filter"];
   rowsArr: Row[];
   buffer: Int32Array;
   shouldCancel: () => boolean;
@@ -111,7 +111,7 @@ const computeView = async ({
 }: {
   rows: Rows;
   buffer: Int32Array;
-  viewConfig: View;
+  viewConfig: ViewConfig;
   shouldCancel: () => boolean;
 }): Promise<number | "cancelled"> => {
   const sortConfig = viewConfig.sort;
@@ -187,7 +187,7 @@ const computeView = async ({
 };
 
 // Ensure viewConfig can handle all columns for sorting and filtering
-export interface View {
+export interface ViewConfig {
   filter: Record<number, string>;
   sort: { direction: "ascending" | "descending"; column: number }[];
   version: number;
@@ -202,12 +202,12 @@ const cache = {
   sortKey: null as string | null,
 };
 
-const updateView = (scrollPosition: number) => {
-  // Logic to update view
+const updateView = () => {
+  // Function logic here or remove if not needed
 };
 
-const renderCells = (scrollPosition: number) => {
-  // Logic to render cells
+const renderCells = () => {
+  // Function logic here or remove if not needed
 };
 
 const handleEvent = async (event: Message) => {
@@ -252,9 +252,9 @@ const handleEvent = async (event: Message) => {
       // Handle scrolling event
       const scrollPosition = message.scrollPosition;
       // Update view based on scroll position
-      updateView(scrollPosition);
+      updateView();
       // Render cell contents
-      renderCells(scrollPosition);
+      renderCells();
       self.postMessage({ type: "scroll-done" });
       return;
     }
@@ -264,7 +264,7 @@ const handleEvent = async (event: Message) => {
 export type ComputeViewEvent = {
   type: "compute-view";
   viewBuffer: Int32Array;
-  viewConfig: View;
+  viewConfig: ViewConfig;
 };
 
 export type SetRowsEvent = {
