@@ -131,6 +131,12 @@ export class Scrollbar {
 
     let deltaY = e.deltaY;
     let deltaX = e.deltaX;
+
+    // Adjust deltas based on zoom level
+    const zoomLevel = window.innerWidth / document.documentElement.clientWidth;
+    deltaY /= zoomLevel;
+    deltaX /= zoomLevel;
+
     // NOTE(gab): it's hard to scroll exactly horizontally or vertically, so zero out
     // the other dimension for small deltas if scrolling fast
     if (Math.abs(deltaY) > 30 && Math.abs(deltaX) < 15) {
@@ -146,9 +152,6 @@ export class Scrollbar {
     }
 
     this.isScrolling = true;
-    // NOTE(gab): makes sure scroll events are only triggered at most
-    // once every frame. useses transient scrolling to keep track of
-    // intermediate scroll offsets
     window.requestAnimationFrame(() => {
       const scrollX =
         this.transientScrollOffsetX != 0
@@ -158,10 +161,11 @@ export class Scrollbar {
         this.transientScrollOffsetY != 0
           ? this.transientScrollOffsetY
           : undefined;
+
       this.scrollBy(scrollX, scrollY);
-      this.isScrolling = false;
       this.transientScrollOffsetX = 0;
       this.transientScrollOffsetY = 0;
+      this.isScrolling = false;
     });
   };
   onThumbMouseDownY = (e: MouseEvent) => {

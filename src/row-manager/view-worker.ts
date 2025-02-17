@@ -122,7 +122,7 @@ const computeView = async ({
   if (sortKey === cache.sortKey) {
     rowsArr = cache.sort ?? rows;
   } else if (!isEmptyFast(sortConfig)) {
-    rowsArr = [...rows]; // todo: can use a global array reference here and manually check if all references are the same still
+    rowsArr = [...rows];
 
     const start = performance.now();
     const sortResult = await timSort(
@@ -184,37 +184,14 @@ const computeView = async ({
     performance.now() - start
   );
   return result.value.numRows;
-
-  // ### SORTING EXPERIMENTS ###
-  //
-  // standard sort
-  // const t0 = performance.now();
-  // [...rowData.arr].sort((a, b) => (a.cells[1]!.s > b.cells[1]!.s ? 1 : -1));
-  // const t1 = performance.now();
-  // testing fast-sort npm lib
-  // fastSort([...rowData.arr]).desc((u) => u.cells[1]!.s);
-
-  // console.log("sort", t1 - t0, t2 - t1, performance.now() - t2);
-
-  // const SIZE = 1_000_000;
-  // const regularArray = Array.from({ length: SIZE }, () =>
-  //   Math.floor(Math.random() * 4294967296)
-  // ); // Max value for Uint32
-  // const toSort = regularArray.map((n) => ({ n: [n], s: n.toString() }));
-  // const uint32Array = new Uint32Array(regularArray);
-
-  // // Test sorting regular JS array
-  // let start = performance.now();
-  // toSort.sort((a, b) => a.n[0] - b.n[0]);
-  // let end = performance.now();
-  // console.log(`Regular array sort took ${end - start}ms`);
-
-  // // Test sorting Uint32Array
-  // start = performance.now();
-  // uint32Array.sort((a, b) => a - b);
-  // end = performance.now();
-  // console.log(`Uint32Array sort took ${end - start}ms`);
 };
+
+// Ensure viewConfig can handle all columns for sorting and filtering
+export interface View {
+  filter: Record<number, string>;
+  sort: { direction: "ascending" | "descending"; column: number }[];
+  version: number;
+}
 
 let rowData: Rows = [];
 
