@@ -234,11 +234,7 @@ const handleEvent = async (event: Message) => {
       cache.sort = null;
       return;
     }
-    case "scroll": {
-      // Worker thread doesn't need to handle scrolling - it's managed by scrollbar.ts
-      self.postMessage({ type: "scroll-done" });
-      return;
-    }
+
   }
 };
 
@@ -253,13 +249,8 @@ export type SetRowsEvent = {
   rows: Rows;
 };
 
-export type ScrollEvent = {
-  type: "scroll";
-  scrollPosition: number;
-};
-
 export type Message = MessageEvent<
-  ComputeViewEvent | SetRowsEvent | ScrollEvent
+  ComputeViewEvent | SetRowsEvent
 >;
 
 self.addEventListener("message", (event: Message) => {
