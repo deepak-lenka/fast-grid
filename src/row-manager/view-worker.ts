@@ -1,4 +1,4 @@
-import { ComputeViewDoneEvent, Rows, View as ViewConfig } from "./row-manager";
+import { ComputeViewDoneEvent, Rows, View } from "./row-manager";
 import { Row } from "../row";
 import { sort as timSort } from "./timsort";
 import { Result } from "../utils/result";
@@ -15,14 +15,14 @@ const filterRows = async ({
   shouldCancel,
   onEarlyResults,
 }: {
-  filter: ViewConfig["filter"];
+  filter: View["filter"];
   rowsArr: Row[];
   buffer: Int32Array;
   shouldCancel: () => boolean;
   onEarlyResults: (numRows: number) => void;
 }): Promise<Result<{ numRows: number }>> => {
   const lowerCaseFilter: Record<number, string> = Object.fromEntries(
-    Object.entries(filter).map(([k, v]) => [k, v.toLowerCase()])
+    Object.entries(filter).map(([k, v]) => [k, (v as string).toLowerCase()])
   );
 
   const MIN_RESULTS_EARLY_RESULT = 50;
@@ -111,7 +111,7 @@ const computeView = async ({
 }: {
   rows: Rows;
   buffer: Int32Array;
-  viewConfig: ViewConfig;
+  viewConfig: View;
   shouldCancel: () => boolean;
 }): Promise<number | "cancelled"> => {
   const sortConfig = viewConfig.sort;
@@ -127,7 +127,7 @@ const computeView = async ({
     const start = performance.now();
     const sortResult = await timSort(
       rowsArr,
-      getSortComparisonFn(sortConfig.map((c) => [c.direction, c.column])),
+      getSortComparisonFn(sortConfig.map((c: { direction: "ascending" | "descending"; column: number }) => [c.direction, c.column])),
       shouldCancel
     );
     if (!sortResult.ok) {
@@ -186,12 +186,6 @@ const computeView = async ({
   return result.value.numRows;
 };
 
-// Ensure viewConfig can handle all columns for sorting and filtering
-export interface ViewConfig {
-  filter: Record<number, string>;
-  sort: { direction: "ascending" | "descending"; column: number }[];
-  version: number;
-}
 
 let rowData: Rows = [];
 
@@ -251,7 +245,7 @@ const handleEvent = async (event: Message) => {
 export type ComputeViewEvent = {
   type: "compute-view";
   viewBuffer: Int32Array;
-  viewConfig: ViewConfig;
+  viewConfig: View;
 };
 
 export type SetRowsEvent = {
