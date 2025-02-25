@@ -202,14 +202,6 @@ const cache = {
   sortKey: null as string | null,
 };
 
-const updateView = () => {
-  // Function logic here or remove if not needed
-};
-
-const renderCells = () => {
-  // Function logic here or remove if not needed
-};
-
 const handleEvent = async (event: Message) => {
   const message = event.data;
   switch (message.type) {
@@ -249,12 +241,7 @@ const handleEvent = async (event: Message) => {
       return;
     }
     case "scroll": {
-      // Handle scrolling event
-      const scrollPosition = message.scrollPosition;
-      // Update view based on scroll position
-      updateView();
-      // Render cell contents
-      renderCells();
+      // Worker thread doesn't need to handle scrolling - it's managed by scrollbar.ts
       self.postMessage({ type: "scroll-done" });
       return;
     }

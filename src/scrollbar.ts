@@ -145,6 +145,9 @@ export class Scrollbar {
       deltaY = 0;
     }
 
+    // NOTE(gab): makes sure scroll events are only triggered at most
+    // once every frame. Uses transient scrolling to keep track of
+    // intermediate scroll offsets
     this.transientScrollOffsetX += deltaX;
     this.transientScrollOffsetY += deltaY;
     if (this.isScrolling) {
